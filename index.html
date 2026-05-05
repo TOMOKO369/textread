@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>AI Text to Speech Reader - Brutalist Design</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,500&amp;family=Be+Vietnam+Pro:wght@400;500&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-bright": "#f9f9f9",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-highest": "#e2e2e2",
+            "primary-container": "#1b1b1b",
+            "outline-variant": "#cfc4c5",
+            "on-surface-variant": "#4c4546",
+            "secondary-container": "#dce0e6",
+            "primary": "#000000",
+            "on-tertiary": "#ffffff",
+            "on-error": "#ffffff",
+            "inverse-surface": "#2f3131",
+            "error-container": "#ffdad6",
+            "surface-dim": "#dadada",
+            "primary-fixed-dim": "#c6c6c6",
+            "background": "#f9f9f9",
+            "error": "#ba1a1a",
+            "secondary-fixed-dim": "#c2c7cd",
+            "primary-fixed": "#e2e2e2",
+            "outline": "#7e7576",
+            "surface-variant": "#e2e2e2",
+            "on-secondary-fixed-variant": "#42474c",
+            "on-background": "#1a1c1c",
+            "surface-tint": "#5e5e5e",
+            "on-primary-container": "#848484",
+            "inverse-on-surface": "#f0f1f1",
+            "on-secondary": "#ffffff",
+            "on-tertiary-fixed": "#1b1b1b",
+            "surface-container": "#eeeeee",
+            "on-surface": "#1a1c1c",
+            "on-error-container": "#93000a",
+            "on-primary-fixed-variant": "#474747",
+            "tertiary-fixed-dim": "#c6c6c6",
+            "surface-container-high": "#e8e8e8",
+            "surface": "#f9f9f9",
+            "on-primary-fixed": "#1b1b1b",
+            "tertiary-fixed": "#e2e2e2",
+            "on-primary": "#ffffff",
+            "on-secondary-fixed": "#171c21",
+            "on-tertiary-fixed-variant": "#474747",
+            "on-secondary-container": "#5e6369",
+            "inverse-primary": "#c6c6c6",
+            "secondary": "#5a5f64",
+            "secondary-fixed": "#dfe3e9",
+            "tertiary-container": "#1b1b1b",
+            "surface-container-low": "#f3f3f4",
+            "tertiary": "#000000",
+            "on-tertiary-container": "#848484"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "unit": "8px",
+            "section-gap": "120px",
+            "gutter": "24px",
+            "margin-page": "40px",
+            "container-max": "1200px"
+          },
+          "fontFamily": {
+            "headline-md": ["Newsreader"],
+            "body-md": ["Be Vietnam Pro"],
+            "label-sm": ["Space Grotesk"],
+            "headline-lg": ["Newsreader"],
+            "label-md": ["Space Grotesk"],
+            "body-lg": ["Be Vietnam Pro"],
+            "headline-xl": ["Newsreader"]
+          },
+          "fontSize": {
+            "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "500" }],
+            "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+            "label-sm": ["12px", { "lineHeight": "1.2", "fontWeight": "500" }],
+            "headline-lg": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "label-md": ["14px", { "lineHeight": "1.2", "fontWeight": "600" }],
+            "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+            "headline-xl": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .brutalist-shadow {
+      box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+    }
+    .custom-range::-webkit-slider-runnable-track {
+      background: #000;
+      height: 1px;
+    }
+    .custom-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: #000;
+      margin-top: -7.5px;
+      cursor: pointer;
+    }
+    body {
+      min-height: max(884px, 100dvh);
+    }
+    /* Scrollbar styling for voice grid */
+    #voice-grid::-webkit-scrollbar {
+      width: 8px;
+    }
+    #voice-grid::-webkit-scrollbar-track {
+      background: #f3f3f4;
+      border-left: 1px solid #000;
+    }
+    #voice-grid::-webkit-scrollbar-thumb {
+      background: #000;
+    }
+    .voice-card {
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+    .voice-card.active {
+      border: 2px solid #000;
+      box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+      transform: translate(-2px, -2px);
+    }
+    .voice-card:not(.active) {
+      border: 1px solid #000;
+    }
+    .voice-card.active .audio-wave {
+      opacity: 1 !important;
+    }
+    .voice-card.active .audio-wave div {
+      animation: bounce 1s infinite alternate;
+    }
+    @keyframes bounce {
+      0% { height: 4px; }
+      100% { height: 24px; }
+    }
+  </style>
+</head>
+
+<body class="bg-surface-bright text-on-surface font-body-md selection:bg-primary selection:text-white pb-20 md:pb-0">
+  <!-- TopAppBar Shell -->
+  <header class="bg-white dark:bg-black border-b border-black dark:border-white fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-black dark:text-white" data-icon="waves">waves</span>
+      <h1 class="text-2xl font-black tracking-tighter text-black dark:text-white uppercase font-['Newsreader'] italic tracking-tight">VOICE_LAB</h1>
+    </div>
+    <button class="hover:bg-gray-100 dark:hover:bg-zinc-900 p-2 active:translate-x-[2px] active:translate-y-[2px] transition-transform">
+      <span class="material-symbols-outlined text-black dark:text-white" data-icon="menu">menu</span>
+    </button>
+  </header>
+
+  <main class="pt-24 pb-32 px-6 max-w-7xl mx-auto">
+    <!-- Header Section -->
+    <section class="mb-12">
+      <h2 class="font-headline-xl text-headline-xl mb-4">Text to Speech</h2>
+      <p class="font-body-lg text-body-lg max-w-2xl text-on-surface-variant">
+        テキストを入力し、音声パラメータを調整して再生してください。ブラウザのネイティブTTSエンジンを活用したブルータリストな音声ジェネレーター。
+      </p>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      
+      <!-- Left Column -->
+      <div class="lg:col-span-7 space-y-8">
+        
+        <!-- Text Input Section -->
+        <div>
+          <div class="flex items-center justify-between border-b border-black pb-4 mb-4">
+            <span class="font-label-md text-label-md uppercase tracking-widest">Input / Source Text</span>
+          </div>
+          <textarea id="text-input" class="w-full h-48 p-5 border-2 border-black bg-white brutalist-shadow focus:outline-none focus:ring-0 resize-none font-body-md text-body-lg placeholder:text-on-surface-variant/50 transition-all focus:-translate-y-1 focus:-translate-x-1" placeholder="ここに読み上げたいテキストを入力してください..."></textarea>
+        </div>
+
+        <!-- Voice Selection Gallery -->
+        <div>
+          <div class="flex items-center justify-between border-b border-black pb-4 mb-6">
+            <span class="font-label-md text-label-md uppercase tracking-widest">Library / Neural Voices</span>
+            <span id="voice-count" class="font-label-sm text-label-sm text-on-surface-variant">0 VOICES AVAILABLE</span>
+          </div>
+          <div id="voice-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-3 pb-4">
+            <!-- Voices injected here via JS -->
+            <div class="p-4 text-center col-span-2 text-on-surface-variant font-label-md">
+              Loading voices...
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Sidebar -->
+      <aside class="lg:col-span-5">
+        <div class="sticky top-24 space-y-8">
+          <div class="p-8 border-2 border-black bg-surface-container-lowest brutalist-shadow">
+            <h4 class="font-label-md text-label-md uppercase tracking-widest mb-8 border-b border-black pb-2">Vocal Parameters</h4>
+            
+            <!-- Speed Slider -->
+            <div class="mb-10">
+              <div class="flex justify-between items-center mb-4">
+                <label class="font-body-md text-body-md font-medium">Speed</label>
+                <span id="rate-value" class="font-label-md text-label-md bg-black text-white px-2 py-0.5">1.0x</span>
+              </div>
+              <input id="rate" class="w-full appearance-none custom-range cursor-pointer" max="2.0" min="0.5" step="0.1" type="range" value="1.0" />
+              <div class="flex justify-between mt-2 font-label-sm text-label-sm text-on-surface-variant">
+                <span>SLOW</span>
+                <span>FAST</span>
+              </div>
+            </div>
+
+            <!-- Pitch Slider -->
+            <div class="mb-10">
+              <div class="flex justify-between items-center mb-4">
+                <label class="font-body-md text-body-md font-medium">Pitch</label>
+                <span id="pitch-value" class="font-label-md text-label-md bg-black text-white px-2 py-0.5">1.0</span>
+              </div>
+              <input id="pitch" class="w-full appearance-none custom-range cursor-pointer" max="2" min="0" step="0.1" type="range" value="1" />
+              <div class="flex justify-between mt-2 font-label-sm text-label-sm text-on-surface-variant">
+                <span>DEEP</span>
+                <span>HIGH</span>
+              </div>
+            </div>
+
+            <button id="play-btn" class="w-full bg-primary text-white font-label-md text-label-md uppercase py-5 hover:bg-on-primary-container transition-colors tracking-widest flex items-center justify-center gap-2 mb-4 active:scale-[0.98]">
+              Play Speech
+              <span class="material-symbols-outlined text-[20px]" data-icon="play_circle">play_circle</span>
+            </button>
+
+            <div class="flex gap-4">
+              <button id="pause-btn" class="w-1/2 border-2 border-black bg-white text-black font-label-md text-label-md uppercase py-3 hover:bg-black hover:text-white transition-colors tracking-widest flex items-center justify-center gap-2 active:scale-[0.98]">
+                Pause
+                <span class="material-symbols-outlined text-[18px]" data-icon="pause">pause</span>
+              </button>
+              <button id="stop-btn" class="w-1/2 border-2 border-black bg-white text-black font-label-md text-label-md uppercase py-3 hover:bg-black hover:text-white transition-colors tracking-widest flex items-center justify-center gap-2 active:scale-[0.98]">
+                Stop
+                <span class="material-symbols-outlined text-[18px]" data-icon="stop">stop</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Decorative Branding / Info -->
+          <div class="bg-black text-white p-8">
+            <p class="font-headline-md text-headline-md italic mb-4 leading-tight">"The voice is the muscle of the soul."</p>
+            <p class="font-label-sm text-label-sm opacity-60">NEURAL ENGINE V4.2 / SPEECH SYNTHESIS API OPTIMIZED FOR BRUTALIST AESTHETICS.</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- BottomNavBar Shell (Mobile) -->
+  <nav class="bg-white dark:bg-black border-t border-black dark:border-white fixed bottom-0 w-full z-50 flex justify-around items-center h-20 pb-safe px-4 md:hidden">
+    <a class="flex flex-col items-center justify-center text-gray-400 dark:text-zinc-600 pt-2 hover:text-black dark:hover:text-white" href="#">
+      <span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+      <span class="font-['Space_Grotesk'] text-[10px] uppercase font-bold tracking-widest">Create</span>
+    </a>
+    <a class="flex flex-col items-center justify-center text-black dark:text-white border-t-4 border-black dark:border-white pt-1 scale-95 transition-all" href="#">
+      <span class="material-symbols-outlined" data-icon="record_voice_over" data-weight="fill" style="font-variation-settings: 'FILL' 1;">record_voice_over</span>
+      <span class="font-['Space_Grotesk'] text-[10px] uppercase font-bold tracking-widest">Voices</span>
+    </a>
+    <a class="flex flex-col items-center justify-center text-gray-400 dark:text-zinc-600 pt-2 hover:text-black dark:hover:text-white" href="#">
+      <span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+      <span class="font-['Space_Grotesk'] text-[10px] uppercase font-bold tracking-widest">Library</span>
+    </a>
+  </nav>
+
+  <!-- Footer Shell -->
+  <footer class="bg-white dark:bg-black border-t border-black dark:border-white w-full py-20 px-6 mt-10 mb-20 md:mb-0">
+    <div class="flex flex-col items-start gap-8 max-w-7xl mx-auto">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-black dark:text-white" data-icon="waves">waves</span>
+        <span class="font-['Newsreader'] italic font-black uppercase text-black dark:text-white text-xl">VOICE_LAB</span>
+      </div>
+      <div class="flex flex-wrap gap-x-12 gap-y-4">
+        <a class="font-['Space_Grotesk'] text-xs uppercase tracking-tighter no-underline hover:opacity-70 transition-opacity" href="#">Terms</a>
+        <a class="font-['Space_Grotesk'] text-xs uppercase tracking-tighter no-underline hover:opacity-70 transition-opacity" href="#">Privacy</a>
+        <a class="font-['Space_Grotesk'] text-xs uppercase tracking-tighter no-underline hover:opacity-70 transition-opacity" href="#">API</a>
+      </div>
+      <div class="mt-8 font-['Space_Grotesk'] text-xs uppercase tracking-tighter text-on-surface-variant">
+        ©2024 VOICE_LAB. ALL RIGHTS RESERVED.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const textInput = document.querySelector('#text-input');
+    const voiceGrid = document.querySelector('#voice-grid');
+    const voiceCount = document.querySelector('#voice-count');
+    const rate = document.querySelector('#rate');
+    const rateValue = document.querySelector('#rate-value');
+    const pitch = document.querySelector('#pitch');
+    const pitchValue = document.querySelector('#pitch-value');
+    const playBtn = document.querySelector('#play-btn');
+    const pauseBtn = document.querySelector('#pause-btn');
+    const stopBtn = document.querySelector('#stop-btn');
+
+    let voices = [];
+    let selectedVoiceName = '';
+    const synth = window.speechSynthesis;
+
+    // Build voice card HTML
+    const createVoiceCard = (voice, isActive) => {
+      const activeClass = isActive ? 'active bg-white' : 'bg-white group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]';
+      const statusText = isActive ? 'SELECTED' : 'Select';
+      const statusOpacity = isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100';
+      const waveOpacity = isActive ? 'opacity-100' : 'opacity-30';
+      const icon = isActive ? 'play_arrow' : 'play_arrow';
+      
+      // Randomize wave heights for visual variety
+      const h1 = Math.floor(Math.random() * 4) + 2;
+      const h2 = Math.floor(Math.random() * 6) + 2;
+      const h3 = Math.floor(Math.random() * 8) + 2;
+      const h4 = Math.floor(Math.random() * 5) + 2;
+
+      return `
+        <div class="voice-card p-6 relative transition-all cursor-pointer ${activeClass}" data-name="${voice.name}">
+          <div class="flex justify-between items-start mb-8">
+            <div class="pr-4">
+              <h3 class="font-headline-md text-[20px] leading-tight mb-2 break-words" style="max-height: 2.6em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${voice.name}</h3>
+              <div class="flex flex-wrap gap-2">
+                <span class="font-label-sm text-label-sm bg-surface-container px-2 py-0.5 rounded">${voice.lang}</span>
+                ${voice.localService ? '<span class="font-label-sm text-[10px] bg-surface-container px-2 py-0.5 rounded">LOCAL</span>' : ''}
+              </div>
+            </div>
+          </div>
+          <div class="flex items-end justify-between">
+            <div class="flex gap-1 h-8 items-center audio-wave ${waveOpacity}">
+              <div class="w-1 bg-primary" style="height: ${h1}px"></div>
+              <div class="w-1 bg-primary" style="height: ${h2}px"></div>
+              <div class="w-1 bg-primary" style="height: ${h3}px"></div>
+              <div class="w-1 bg-primary" style="height: ${h4}px"></div>
+              <div class="w-1 bg-primary" style="height: ${h1}px"></div>
+            </div>
+            <span class="font-label-md text-label-md uppercase ${statusOpacity} transition-opacity font-bold select-label">${statusText}</span>
+          </div>
+        </div>
+      `;
+    };
+
+    // Render all voices
+    const renderVoices = () => {
+      voiceGrid.innerHTML = '';
+      
+      if (voices.length === 0) {
+        voiceGrid.innerHTML = '<div class="p-4 text-center col-span-2 text-on-surface-variant font-label-md">No voices found.</div>';
+        return;
+      }
+
+      voiceCount.textContent = `${voices.length} VOICES AVAILABLE`;
+
+      // Sort: Japanese first, then others
+      const jpVoices = voices.filter(voice => voice.lang.includes('ja'));
+      const otherVoices = voices.filter(voice => !voice.lang.includes('ja'));
+      const sortedVoices = [...jpVoices, ...otherVoices];
+
+      // Select first voice by default if none selected
+      if (!selectedVoiceName && sortedVoices.length > 0) {
+        selectedVoiceName = sortedVoices[0].name;
+      }
+
+      sortedVoices.forEach(voice => {
+        const isActive = voice.name === selectedVoiceName;
+        const cardHTML = createVoiceCard(voice, isActive);
+        voiceGrid.insertAdjacentHTML('beforeend', cardHTML);
+      });
+
+      // Add click listeners to cards
+      document.querySelectorAll('.voice-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          selectedVoiceName = card.getAttribute('data-name');
+          renderVoices(); // Re-render to update active state
+        });
+      });
+    };
+
+    // Initialize voices
+    const populateVoices = () => {
+      voices = synth.getVoices();
+      if (voices.length > 0) {
+        renderVoices();
+      }
+    };
+
+    // Load voices
+    populateVoices();
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = populateVoices;
+    }
+
+    // Parameters update
+    rate.addEventListener('input', () => {
+      rateValue.textContent = Number(rate.value).toFixed(1) + 'x';
+    });
+    pitch.addEventListener('input', () => {
+      pitchValue.textContent = Number(pitch.value).toFixed(1);
+    });
+
+    // Play functionality
+    const speak = () => {
+      if (synth.speaking && !synth.paused) {
+        console.log('Already speaking...');
+        return;
+      }
+      
+      if (synth.paused) {
+        synth.resume();
+        return;
+      }
+
+      if (textInput.value !== '') {
+        const speakText = new SpeechSynthesisUtterance(textInput.value);
+
+        speakText.onend = e => {
+          console.log('Done speaking...');
+          // Stop wave animation
+          document.querySelectorAll('.voice-card.active .audio-wave div').forEach(el => {
+            el.style.animation = 'none';
+          });
+        };
+
+        speakText.onstart = e => {
+          // Start wave animation
+          document.querySelectorAll('.voice-card.active .audio-wave div').forEach(el => {
+            el.style.animation = 'bounce 0.5s infinite alternate';
+          });
+        };
+
+        speakText.onerror = e => {
+          console.error('Speech synthesis error', e);
+        };
+
+        // Find selected voice
+        const voice = voices.find(v => v.name === selectedVoiceName);
+        if (voice) {
+          speakText.voice = voice;
+        }
+
+        speakText.rate = rate.value;
+        speakText.pitch = pitch.value;
+
+        synth.speak(speakText);
+      }
+    };
+
+    playBtn.addEventListener('click', speak);
+
+    pauseBtn.addEventListener('click', () => {
+      if (synth.speaking && !synth.paused) {
+        synth.pause();
+        document.querySelectorAll('.voice-card.active .audio-wave div').forEach(el => {
+          el.style.animationPlayState = 'paused';
+        });
+      } else if (synth.paused) {
+        synth.resume();
+        document.querySelectorAll('.voice-card.active .audio-wave div').forEach(el => {
+          el.style.animationPlayState = 'running';
+        });
+      }
+    });
+
+    stopBtn.addEventListener('click', () => {
+      synth.cancel();
+      document.querySelectorAll('.voice-card.active .audio-wave div').forEach(el => {
+        el.style.animation = 'none';
+      });
+    });
+  </script>
+</body>
+</html>

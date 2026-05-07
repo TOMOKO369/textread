@@ -190,6 +190,24 @@
             </a>
           </div>
           <textarea id="text-input" class="w-full h-48 p-5 border-2 border-black bg-white brutalist-shadow focus:outline-none focus:ring-0 resize-none font-body-md text-body-lg placeholder:text-on-surface-variant/50 transition-all focus:-translate-y-1 focus:-translate-x-1" placeholder="ここに読み上げたいテキストを入力してください..."></textarea>
+          
+          <!-- Mobile Playback Controls -->
+          <div class="lg:hidden flex flex-col gap-4 mt-8">
+            <button class="play-btn w-full bg-primary text-white font-label-md text-label-md uppercase py-5 hover:bg-on-primary-container transition-colors tracking-widest flex items-center justify-center gap-2 active:scale-[0.98]">
+              Play Speech
+              <span class="material-symbols-outlined text-[20px]" data-icon="play_circle">play_circle</span>
+            </button>
+            <div class="flex gap-4">
+              <button class="pause-btn w-1/2 border-2 border-black bg-white text-black font-label-md text-label-md uppercase py-3 hover:bg-black hover:text-white transition-colors tracking-widest flex items-center justify-center gap-2 active:scale-[0.98]">
+                Pause
+                <span class="material-symbols-outlined text-[18px]" data-icon="pause">pause</span>
+              </button>
+              <button class="stop-btn w-1/2 border-2 border-black bg-white text-black font-label-md text-label-md uppercase py-3 hover:bg-black hover:text-white transition-colors tracking-widest flex items-center justify-center gap-2 active:scale-[0.98]">
+                Stop
+                <span class="material-symbols-outlined text-[18px]" data-icon="stop">stop</span>
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- Voice Selection Gallery -->
@@ -239,17 +257,17 @@
               </div>
             </div>
 
-            <button id="play-btn" class="w-full bg-primary text-white font-label-md text-label-md uppercase py-5 hover:bg-on-primary-container transition-colors tracking-widest flex items-center justify-center gap-2 mb-4 active:scale-[0.98]">
+            <button class="play-btn hidden lg:flex w-full bg-primary text-white font-label-md text-label-md uppercase py-5 hover:bg-on-primary-container transition-colors tracking-widest items-center justify-center gap-2 mb-4 active:scale-[0.98]">
               Play Speech
               <span class="material-symbols-outlined text-[20px]" data-icon="play_circle">play_circle</span>
             </button>
 
-            <div class="flex gap-4">
-              <button id="pause-btn" class="w-1/2 border-2 border-black bg-white text-black font-label-md text-label-md uppercase py-3 hover:bg-black hover:text-white transition-colors tracking-widest flex items-center justify-center gap-2 active:scale-[0.98]">
+            <div class="hidden lg:flex gap-4">
+              <button class="pause-btn w-1/2 border-2 border-black bg-white text-black font-label-md text-label-md uppercase py-3 hover:bg-black hover:text-white transition-colors tracking-widest flex items-center justify-center gap-2 active:scale-[0.98]">
                 Pause
                 <span class="material-symbols-outlined text-[18px]" data-icon="pause">pause</span>
               </button>
-              <button id="stop-btn" class="w-1/2 border-2 border-black bg-white text-black font-label-md text-label-md uppercase py-3 hover:bg-black hover:text-white transition-colors tracking-widest flex items-center justify-center gap-2 active:scale-[0.98]">
+              <button class="stop-btn w-1/2 border-2 border-black bg-white text-black font-label-md text-label-md uppercase py-3 hover:bg-black hover:text-white transition-colors tracking-widest flex items-center justify-center gap-2 active:scale-[0.98]">
                 Stop
                 <span class="material-symbols-outlined text-[18px]" data-icon="stop">stop</span>
               </button>
@@ -308,9 +326,9 @@
     const rateValue = document.querySelector('#rate-value');
     const pitch = document.querySelector('#pitch');
     const pitchValue = document.querySelector('#pitch-value');
-    const playBtn = document.querySelector('#play-btn');
-    const pauseBtn = document.querySelector('#pause-btn');
-    const stopBtn = document.querySelector('#stop-btn');
+    const playBtns = document.querySelectorAll('.play-btn');
+    const pauseBtns = document.querySelectorAll('.pause-btn');
+    const stopBtns = document.querySelectorAll('.stop-btn');
 
     let voices = [];
     let selectedVoiceName = '';
@@ -460,9 +478,9 @@
       }
     };
 
-    playBtn.addEventListener('click', speak);
+    playBtns.forEach(btn => btn.addEventListener('click', speak));
 
-    pauseBtn.addEventListener('click', () => {
+    pauseBtns.forEach(btn => btn.addEventListener('click', () => {
       if (synth.speaking && !synth.paused) {
         synth.pause();
         document.querySelectorAll('.voice-card.active .audio-wave div').forEach(el => {
@@ -474,14 +492,14 @@
           el.style.animationPlayState = 'running';
         });
       }
-    });
+    }));
 
-    stopBtn.addEventListener('click', () => {
+    stopBtns.forEach(btn => btn.addEventListener('click', () => {
       synth.cancel();
       document.querySelectorAll('.voice-card.active .audio-wave div').forEach(el => {
         el.style.animation = 'none';
       });
-    });
+    }));
   </script>
 </body>
 </html>

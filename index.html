@@ -191,6 +191,13 @@
           </div>
           <textarea id="text-input" class="w-full h-48 p-5 border-2 border-black bg-white brutalist-shadow focus:outline-none focus:ring-0 resize-none font-body-md text-body-lg placeholder:text-on-surface-variant/50 transition-all focus:-translate-y-1 focus:-translate-x-1" placeholder="ここに読み上げたいテキストを入力してください..."></textarea>
           
+          <div class="flex justify-between items-center mt-2">
+            <button id="clear-btn" class="border border-gray-300 bg-white text-gray-600 font-body-md text-[13px] px-2 py-1 hover:bg-gray-50 transition-colors flex items-center gap-1 active:scale-[0.98]">
+              <span class="font-bold text-gray-700 text-[10px]">✖</span> クリア
+            </button>
+            <span id="char-count" class="font-body-md text-[13px] text-gray-500">入力文字数: 0文字</span>
+          </div>
+          
           <!-- Mobile Playback Controls -->
           <div class="lg:hidden flex flex-col gap-4 mt-8">
             <button class="play-btn w-full bg-primary text-white font-label-md text-label-md uppercase py-5 hover:bg-on-primary-container transition-colors tracking-widest flex items-center justify-center gap-2 active:scale-[0.98]">
@@ -320,6 +327,8 @@
 
   <script>
     const textInput = document.querySelector('#text-input');
+    const clearBtn = document.querySelector('#clear-btn');
+    const charCount = document.querySelector('#char-count');
     const voiceGrid = document.querySelector('#voice-grid');
     const voiceCount = document.querySelector('#voice-count');
     const rate = document.querySelector('#rate');
@@ -329,6 +338,23 @@
     const playBtns = document.querySelectorAll('.play-btn');
     const pauseBtns = document.querySelectorAll('.pause-btn');
     const stopBtns = document.querySelectorAll('.stop-btn');
+
+    // Update character count
+    const updateCharCount = () => {
+      charCount.textContent = `入力文字数: ${textInput.value.length}文字`;
+    };
+
+    textInput.addEventListener('input', updateCharCount);
+
+    // Clear text
+    clearBtn.addEventListener('click', () => {
+      textInput.value = '';
+      updateCharCount();
+      textInput.focus();
+    });
+
+    // Initial count
+    updateCharCount();
 
     let voices = [];
     let selectedVoiceName = '';
